@@ -22,8 +22,11 @@
 (defrecord CustomRemote []
   net/FulcroRemoteI
   (transmit [this {:keys [::net/edn ::net/ok-handler]}]
+    ;; At the moment we just want to introduce {:testing :foo} into app state.
+    ;; It ultimately doesn't, and the `merge!` in the transaction log shows that
+    ;; the value of :testing is ::prim/not-found
     (ok-handler {:transaction edn
-                 :body        :derp}))
+                 :body        {:testing :foo}}))
   (abort [this abort-id]))
 
 (defn ^:export init []
@@ -32,6 +35,7 @@
                                     :shared-fn ::i18n/current-locale}
                :networking {:custom (map->CustomRemote {})}
                :started-callback (fn [{:keys [reconciler] :as app}]
+                                   ;; No component class specified, so it shouldn't attempt to normalize
                                    (df/load reconciler :testing nil
                                             {:remote :custom}))))
   (start))
