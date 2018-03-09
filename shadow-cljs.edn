@@ -1,0 +1,42 @@
+{:lein   {:profile "cljs"}
+ :nrepl  {:port 9000}
+ :builds {:main     {:target     :browser
+                     :output-dir "resources/public/js/main"
+                     :asset-path "/js/main"
+
+                     :modules    {:app {:entries [load-ok-repro.client]}}
+
+                     :devtools   {:after-load load-ok-repro.client/start
+                                  :preloads [fulcro.inspect.preload load-ok-repro.development-preload]
+                                  :http-root "resources/public"
+                                  :http-port 8020}}
+
+          :i18n     {:target           :browser
+                     :output-dir       "target/i18n"
+                     :asset-path       "/"
+                     :modules          {:i18n {:entries [load-ok-repro.client]}}
+                     :compiler-options {:optimization :whitespace}}
+
+          :test     {:target    :browser-test
+                     :test-dir  "resources/public/js/test"
+                     :ns-regexp "-spec$"
+                     :runner-ns load-ok-repro.client-test-main
+                     :devtools {:http-port          8022
+                                :http-resource-root "public"
+                                :http-root          "resources/public/js/test"}}
+
+          :ci-tests {:target     :karma
+                     :js-options {:js-provider :shadow}
+                     :output-to  "target/ci.js"
+                     :ns-regexp  "-spec$"}
+
+          :cards    {:target           :browser
+                     :output-dir       "resources/public/js/cards"
+                     :asset-path       "/js/cards"
+                     :compiler-options {:devcards true}
+                     :modules          {:main
+                                        {:entries [load-ok-repro.cards]}}
+                     :devtools         {:after-load load-ok-repro.cards/refresh
+                                        :preloads [fulcro.inspect.preload load-ok-repro.development-preload]
+                                        :http-root "resources/public"
+                                        :http-port 8023}}}}
